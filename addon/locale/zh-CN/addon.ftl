@@ -9,3 +9,14 @@ prefs-table-title = 标题
 prefs-table-detail = 详情
 tabpanel-lib-tab-label = 库标签
 tabpanel-reader-tab-label = 阅读器标签
+
+menuitem-fetch-metadata = 获取元数据
+metadata-updating = 正在更新元数据...
+metadata-update-complete = 已更新 {$totalItems} 个条目中的 {$successCount} 个
+
+menuitem-fetch-metadata = 获取元数据
+search-results = 搜索结果
+select-result = 选择结果
+select-result-description = 请从搜索结果中选择匹配的文献:
+confirm = 确认
+cancel = 取消

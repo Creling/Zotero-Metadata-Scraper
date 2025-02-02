@@ -1,10 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "__addonName__",
-  "version": "__buildVersion__",
-  "description": "__description__",
-  "homepage_url": "__homepage__",
-  "author": "__author__",
+  "name": "Zotero Metadata Scraper",
+  "version": "1.0.0",
+  "description": "A Zotero plugin to fetch metadata from multiple sources",
+  "homepage_url": "https://github.com/creling/zotero-metadata-scraper",
+  "author": "creling",
   "icons": {
     "48": "content/icons/favicon@0.5x.png",
     "96": "content/icons/favicon.png"
@@ -13,7 +13,7 @@
     "zotero": {
       "id": "__addonID__",
       "update_url": "__updateURL__",
-      "strict_min_version": "6.999",
+      "strict_min_version": "7.0",
       "strict_max_version": "7.*"
     }
   }
