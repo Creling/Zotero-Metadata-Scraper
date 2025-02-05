@@ -1,9 +1,7 @@
 <linkset>
   <html:link rel="localization" href="__addonRef__-preferences.ftl" />
 </linkset>
-<groupbox
-  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });"
->
+<groupbox onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window });">
   <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
   <hbox>
     <html:label
@@ -19,7 +17,7 @@
       href="#"
       onclick="Zotero.launchURL('https://www.semanticscholar.org/product/api#api-key'); return false;"
       data-l10n-id="pref-get-api-key"
-      style="margin-left: 10px; text-decoration: underline; cursor: pointer;"
+      style="margin-left: 10px; text-decoration: underline; cursor: pointer"
     ></html:a>
   </hbox>
   <hbox class="virtualized-table-container" flex="1" height="300px">

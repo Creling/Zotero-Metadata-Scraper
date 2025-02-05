@@ -42,9 +42,7 @@ export interface DBLPResult {
 }
 
 export class DBLPService {
-  private static async fetchBibTeX(
-    url: string,
-  ): Promise<bibtexParse.BibtexEntry | null> {
+  private static async fetchBibTeX(url: string): Promise<bibtexParse.BibtexEntry | null> {
     try {
       const bibUrl = `${url}.bib`;
       const response = await fetch(bibUrl);
@@ -76,14 +74,10 @@ export class DBLPService {
     throw new Error("No BibTeX data found");
   }
 
-  public static async searchByTitle(
-    title: string,
-  ): Promise<bibtexParse.BibtexEntry[]> {
+  public static async searchByTitle(title: string): Promise<bibtexParse.BibtexEntry[]> {
     try {
       const encodedTitle = encodeURIComponent(title);
-      const response = await fetch(
-        `https://dblp.org/search/publ/api?q=${encodedTitle}&format=json`,
-      );
+      const response = await fetch(`https://dblp.org/search/publ/api?q=${encodedTitle}&format=json`);
 
       if (!response.ok) {
         throw new Error(`DBLP API error: ${response.statusText}`);

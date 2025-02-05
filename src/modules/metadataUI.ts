@@ -2,10 +2,7 @@ import { getString } from "../utils/locale";
 import { MetadataUpdater } from "./metadataUpdater";
 
 export class MetadataUIFactory {
-  private static async updateItems(
-    items: Zotero.Item[],
-    source: "dblp" | "semantic-scholar",
-  ) {
+  private static async updateItems(items: Zotero.Item[], source: "dblp" | "semantic-scholar") {
     const progressWin = new ztoolkit.ProgressWindow(addon.data.config.addonName)
       .createLine({
         text: getString("metadata-updating"),
