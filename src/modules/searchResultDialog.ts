@@ -1,8 +1,9 @@
 import { getString } from "../utils/locale";
 import { DBLPResult } from "../services/dblp";
+import * as bibtexParse from "@orcid/bibtex-parse-js";
 
 export class SearchResultDialog {
-  public static async show(results: DBLPResult[]): Promise<DBLPResult | null> {
+  public static async show(results: bibtexParse.BibtexEntry[]): Promise<bibtexParse.BibtexEntry | null> {
     return new Promise((resolve) => {
       ztoolkit.log("results");
       ztoolkit.log(results);
@@ -62,7 +63,7 @@ export class SearchResultDialog {
                           fontWeight: "bold",
                         },
                         properties: {
-                          value: result.title,
+                          value: result.entryTags.title,
                         },
                       },
                       {
@@ -72,7 +73,7 @@ export class SearchResultDialog {
                           marginTop: "2px",
                         },
                         properties: {
-                          value: (result.authors ?? []).join(", "),
+                          value: (result.entryTags.author || "").split(" and ").join(", "),
                         },
                       },
                       {
@@ -83,11 +84,11 @@ export class SearchResultDialog {
                         },
                         properties: {
                           value: [
-                            result.journal || result.booktitle || result.venue,
-                            result.volume && `Vol. ${result.volume}`,
-                            result.number && `No. ${result.number}`,
-                            result.pages && `pp. ${result.pages}`,
-                            result.year && `(${result.year})`,
+                            result.entryTags.journal || result.entryTags.booktitle || result.entryTags.venue,
+                            result.entryTags.volume && `Vol. ${result.entryTags.volume}`,
+                            result.entryTags.number && `No. ${result.entryTags.number}`,
+                            result.entryTags.pages && `pp. ${result.entryTags.pages}`,
+                            result.entryTags.year && `(${result.entryTags.year})`,
                           ]
                             .filter(Boolean)
                             .join(", "),
@@ -111,8 +112,7 @@ export class SearchResultDialog {
                       if (!listbox) return;
 
                       // Deselect all items
-                      const items =
-                        listbox.getElementsByTagName("richlistitem");
+                      const items = listbox.getElementsByTagName("richlistitem");
                       for (const item of items) {
                         item.setAttribute("selected", "false");
                       }

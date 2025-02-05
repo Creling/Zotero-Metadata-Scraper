@@ -1,5 +1,4 @@
-pref-title = 插件模板设置示例
-pref-enable =
-    .label = 开启
-pref-input = 输入
+pref-title = Api 密钥
+pref-semantic-scholar-api-key = Semantic Scholar API 密钥
+pref-get-api-key = 获取 API 密钥
 pref-help = { $name } Build { $version } { $time }

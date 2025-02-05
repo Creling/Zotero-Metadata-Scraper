@@ -4,7 +4,7 @@
   "description": "A Zotero plugin to fetch metadata from multiple sources",
   "config": {
     "addonName": "Zotero Metadata Scraper",
-    "addonID": "metadatascraper@example.com",
+    "addonID": "metadatascraper@creling",
     "addonRef": "metadatascraper",
     "addonInstance": "MetadataScraper",
     "prefsPrefix": "extensions.zotero.metadatascraper"
@@ -43,7 +43,7 @@
     "zotero-types": "^3.1.6"
   },
   "prettier": {
-    "printWidth": 80,
+    "printWidth": 120,
     "tabWidth": 2,
     "endOfLine": "lf",
     "overrides": [

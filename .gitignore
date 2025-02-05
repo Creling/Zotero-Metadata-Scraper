@@ -1,6 +1,6 @@
-
 node_modules
 .env
 .scaffold
 Zotero_linux-x86_64/
 zotero-metadata-scraper.xpi
+.vscode/
