@@ -14,10 +14,6 @@ export class MetadataUpdater {
       const results = await DBLPService.searchByTitle(title);
       if (results.length === 0) return false;
 
-      // if (results.length === 1) {
-      //   return this.updateFromDBLP(item, results[0]);
-      // }
-
       const selected = await SearchResultDialog.show(results);
       if (!selected) return false;
 
@@ -74,53 +70,28 @@ export class MetadataUpdater {
   ): Promise<boolean> {
     try {
       ztoolkit.log("Updating item metadata from DBLP:", item, result);
+
       // Update item type first
-      Zotero.ItemTypes.getID("journalArticle");
       const newType = this.getZoteroItemType(result.type);
-      ztoolkit.log("New item type:", newType);
-      if (item.itemType !== newType) {
-        const newItem = new Zotero.Item(
-          newType as _ZoteroTypes.Item.ItemTypeMapping[keyof _ZoteroTypes.Item.ItemTypeMapping],
-        );
-        // Copy fields that both types have in common
-        const fields = Object.keys(item.toJSON());
-        for (const field of fields) {
-          if (field !== "itemType" && field !== "creators") {
-            try {
-              const value = item.getField(field);
-              if (value) {
-                newItem.setField(field, value);
-              }
-            } catch (e) {
-              // Skip fields that don't exist in the new type
-              continue;
-            }
-          }
-        }
-        // Copy creators
-        const creators = item.getCreators();
-        if (creators.length > 0) {
-          newItem.setCreators(creators);
-        }
-        // Save new item and remove old one
-        await newItem.saveTx();
-        await item.eraseTx();
-        item = newItem;
+      const itemTypeID = Zotero.ItemTypes.getID(newType);
+      if (typeof itemTypeID === "number") {
+        item.setType(itemTypeID);
+      } else {
+        throw new Error("Invalid item type ID");
       }
+      Zotero.ItemTypes.getID("journalArticle");
 
       // Update basic metadata
       item.setField("title", result.title);
       if (result.year) {
         item.setField("date", result.year);
       }
-      if (result.venue) {
-        item.setField("publicationTitle", result.venue);
-      }
-      if (result.journal) {
-        item.setField("publicationTitle", result.journal);
-      }
       if (result.booktitle) {
         item.setField("proceedingsTitle", result.booktitle);
+        item.setField("conferenceName", result.booktitle);
+      }
+      if (result.journal) {
+        item.setField("journalAbbreviation", result.journal);
       }
       if (result.doi) {
         item.setField("DOI", result.doi);
@@ -164,7 +135,7 @@ export class MetadataUpdater {
       await item.saveTx();
       return true;
     } catch (error) {
-      console.error("Error updating metadata from DBLP:", error);
+      ztoolkit.log("Error updating metadata from DBLP:", error);
       return false;
     }
   }
