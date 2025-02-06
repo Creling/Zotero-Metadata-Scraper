@@ -47,12 +47,14 @@
 ### 设置
 
 1. 克隆仓库：
+
 ```bash
 git clone https://github.com/creling/zotero-metadata-scraper.git
 cd zotero-metadata-scraper
 ```
 
 2. 安装依赖：
+
 ```bash
 npm install
 ```
@@ -60,11 +62,13 @@ npm install
 ### 构建
 
 - 开发构建（支持热重载）：
+
 ```bash
 npm run start
 ```
 
 - 生产构建：
+
 ```bash
 npm run build
 ```

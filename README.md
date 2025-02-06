@@ -47,12 +47,14 @@ To increase API rate limits for Semantic Scholar:
 ### Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/creling/zotero-metadata-scraper.git
 cd zotero-metadata-scraper
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -60,11 +62,13 @@ npm install
 ### Build
 
 - Development build with hot reload:
+
 ```bash
 npm run start
 ```
 
 - Production build:
+
 ```bash
 npm run build
 ```
