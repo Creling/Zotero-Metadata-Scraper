@@ -10,7 +10,6 @@ prefs-table-detail = 详情
 tabpanel-lib-tab-label = 库标签
 tabpanel-reader-tab-label = 阅读器标签
 
-menuitem-fetch-metadata = 获取元数据
 metadata-updating = 正在更新元数据...
 metadata-update-complete = 已更新 {$totalItems} 个条目中的 {$successCount} 个
 
