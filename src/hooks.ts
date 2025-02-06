@@ -18,6 +18,7 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   // @ts-ignore This is a moz feature
   win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-mainWindow.ftl`);
 
+  MetadataUIFactory.registerPreferenceUI();
   MetadataUIFactory.registerRightClickMenuItem();
 }
 
