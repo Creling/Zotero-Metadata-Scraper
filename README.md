@@ -7,7 +7,7 @@ A Zotero plugin that automatically retrieves and updates paper metadata from mul
 - Fetch metadata from multiple sources:
   - [DBLP](https://dblp.org/)
   - [Semantic Scholar](https://www.semanticscholar.org/)
-  - ...
+  - ...  (Please open an issue if additional academic sources are require)
 - Update publication metadata automatically
 - Multi-language support (English, Chinese)
 
