@@ -1,6 +1,6 @@
 # Zotero Metadata Scraper
 
-A Zotero plugin to automatically fetch and update publication metadata from multiple academic sources.
+A Zotero plugin that automatically retrieves and updates paper metadata from multiple academic sources based on paper titles.
 
 ## Features
 
