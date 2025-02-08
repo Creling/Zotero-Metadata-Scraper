@@ -29,10 +29,7 @@ A Zotero plugin that automatically retrieves and updates paper metadata from mul
 
 ![image](https://github.com/user-attachments/assets/05221bd1-05c3-4fe0-86ee-571a0487bcf6)
 
-
-
 ![image](https://github.com/user-attachments/assets/6990bd4c-4b23-4288-b95b-b8f0086b75d7)
-
 
 ## Configuration
 
