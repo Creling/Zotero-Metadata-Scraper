@@ -47,32 +47,61 @@ export class MetadataUIFactory {
     });
   }
 
-  public static registerRightClickMenuItem() {
+  public static registerRightClickMenuItem(win: _ZoteroTypes.MainWindow) {
     const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`;
-    ztoolkit.Menu.register("item", {
-      tag: "menu",
-      label: getString("menuitem-fetch-metadata"),
-      icon: menuIcon,
-      children: [
-        {
-          tag: "menuitem",
-          label: "DBLP",
-          commandListener: async (ev) => {
-            const items = Zotero.getActiveZoteroPane().getSelectedItems();
-            if (!items || !items.length) return;
-            await this.updateItems(items, "dblp");
-          },
+    const popup = win.document.getElementById("zotero-itemmenu");
+    if (!popup) return;
+
+    ztoolkit.UI.appendElement(
+      {
+        tag: "menu",
+        namespace: "xul",
+        id: `${addon.data.config.addonRef}-fetch-menu`,
+        attributes: {
+          label: getString("menuitem-fetch-metadata"),
+          image: menuIcon,
+          class: "menu-iconic",
         },
-        {
-          tag: "menuitem",
-          label: "Semantic Scholar",
-          commandListener: async (ev) => {
-            const items = Zotero.getActiveZoteroPane().getSelectedItems();
-            if (!items || !items.length) return;
-            await this.updateItems(items, "semantic-scholar");
+        children: [
+          {
+            tag: "menupopup",
+            namespace: "xul",
+            children: [
+              {
+                tag: "menuitem",
+                namespace: "xul",
+                attributes: { label: "DBLP" },
+                listeners: [
+                  {
+                    type: "command",
+                    listener: async () => {
+                      const items = Zotero.getActiveZoteroPane().getSelectedItems();
+                      if (!items || !items.length) return;
+                      await MetadataUIFactory.updateItems(items, "dblp");
+                    },
+                  },
+                ],
+              },
+              {
+                tag: "menuitem",
+                namespace: "xul",
+                attributes: { label: "Semantic Scholar" },
+                listeners: [
+                  {
+                    type: "command",
+                    listener: async () => {
+                      const items = Zotero.getActiveZoteroPane().getSelectedItems();
+                      if (!items || !items.length) return;
+                      await MetadataUIFactory.updateItems(items, "semantic-scholar");
+                    },
+                  },
+                ],
+              },
+            ],
           },
-        },
-      ],
-    });
+        ],
+      },
+      popup,
+    );
   }
 }

@@ -1,5 +1,6 @@
 {
   "name": "zotero-metadata-scraper",
+  "type": "module",
   "version": "1.0.0",
   "description": "A Zotero plugin to fetch metadata from multiple sources",
   "config": {
@@ -30,7 +31,7 @@
   },
   "dependencies": {
     "@orcid/bibtex-parse-js": "^0.0.25",
-    "zotero-plugin-toolkit": "^4.1.1"
+    "zotero-plugin-toolkit": "^5.1.0-beta.14"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
@@ -39,8 +40,8 @@
     "prettier": "^3.5.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0",
-    "zotero-plugin-scaffold": "^0.2.3",
-    "zotero-types": "^3.1.7"
+    "zotero-plugin-scaffold": "^0.8.6",
+    "zotero-types": "^4.1.2"
   },
   "prettier": {
     "printWidth": 120,

@@ -11,15 +11,14 @@ async function onStartup() {
   await Promise.all(Zotero.getMainWindows().map((win) => onMainWindowLoad(win)));
 }
 
-async function onMainWindowLoad(win: Window): Promise<void> {
+async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit();
 
-  // @ts-ignore This is a moz feature
   win.MozXULElement.insertFTLIfNeeded(`${addon.data.config.addonRef}-mainWindow.ftl`);
 
   MetadataUIFactory.registerPreferenceUI();
-  MetadataUIFactory.registerRightClickMenuItem();
+  MetadataUIFactory.registerRightClickMenuItem(win);
 }
 
 async function onMainWindowUnload(win: Window): Promise<void> {
@@ -32,7 +31,7 @@ function onShutdown(): void {
   addon.data.dialog?.window?.close();
   // Remove addon object
   addon.data.alive = false;
-  // @ts-ignore - Plugin instance is not typed
+  // @ts-expect-error - Plugin instance is not typed
   delete Zotero[addon.data.config.addonInstance];
 }
 
