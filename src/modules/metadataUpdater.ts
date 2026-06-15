@@ -1,7 +1,9 @@
-import { DBLPResult, DBLPService } from "../services/dblp";
+import { DBLPService } from "../services/dblp";
 import { SearchResultDialog } from "./searchResultDialog";
 import { SemanticScholarService } from "../services/semanticScholar";
+import { getString } from "../utils/locale";
 import * as bibtexParse from "@orcid/bibtex-parse-js";
+
 export class MetadataUpdater {
   public static async updateItemMetadata(
     item: Zotero.Item,
@@ -10,24 +12,23 @@ export class MetadataUpdater {
     const title = item.getField("title") as string;
     if (!title) return false;
 
-    if (source === "dblp") {
-      const results = await DBLPService.searchByTitle(title);
-      if (results.length === 0) return false;
+    const results =
+      source === "dblp"
+        ? await DBLPService.searchByTitle(title)
+        : await SemanticScholarService.searchByTitle(title);
 
-      const selected = await SearchResultDialog.show(results);
-      if (!selected) return false;
-
-      return this.updateFromBibtex(item, selected);
-    } else {
-      // Use Semantic Scholar implementation
-      const results = await SemanticScholarService.searchByTitle(title);
-      if (results.length === 0) return false;
-
-      const selected = await SearchResultDialog.show(results);
-      if (!selected) return false;
-
-      return this.updateFromBibtex(item, selected);
+    if (results.length === 0) {
+      new ztoolkit.ProgressWindow(addon.data.config.addonName)
+        .createLine({ text: getString("metadata-no-results", { args: { title } }), type: "fail" })
+        .show()
+        .startCloseTimer(5000);
+      return false;
     }
+
+    const selected = await SearchResultDialog.show(results);
+    if (!selected) return false;
+
+    return this.updateFromBibtex(item, selected);
   }
 
   private static getZoteroItemType(dblpType: string): string {

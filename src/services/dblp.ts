@@ -86,9 +86,12 @@ export class DBLPService {
       const data = (await response.json()) as unknown as DBLPResponse;
       const hits = data.result?.hits?.hit || [];
 
-      return Promise.all(hits.map((hit) => this.parseHit(hit)));
+      const settled = await Promise.allSettled(hits.map((hit) => this.parseHit(hit)));
+      return settled
+        .filter((r): r is PromiseFulfilledResult<bibtexParse.BibtexEntry> => r.status === "fulfilled")
+        .map((r) => r.value);
     } catch (error) {
-      console.error("Error fetching from DBLP:", error);
+      ztoolkit.log("Error fetching from DBLP:", error);
       return [];
     }
   }

@@ -13,6 +13,7 @@ tabpanel-reader-tab-label = Reader Tab
 menuitem-fetch-metadata = Fetch Metadata
 metadata-updating = Updating metadata...
 metadata-update-complete = Updated {$successCount} of {$totalItems} items
+metadata-no-results = No matching results found for: {$title}
 
 search-results = Search Results
 select-result = Select Result

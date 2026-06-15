@@ -12,6 +12,7 @@ tabpanel-reader-tab-label = 阅读器标签
 
 metadata-updating = 正在更新元数据...
 metadata-update-complete = 已更新 {$totalItems} 个条目中的 {$successCount} 个
+metadata-no-results = 未找到匹配结果: {$title}
 
 menuitem-fetch-metadata = 获取元数据
 search-results = 搜索结果

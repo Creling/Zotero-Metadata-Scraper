@@ -64,22 +64,27 @@ export class SemanticScholarService {
       }
 
       const data = response.response;
-      const hits = data.data || [];
+      const hits: SemanticScholarResponse[] = data.data || [];
 
-      return Promise.all(hits.map((hit: SemanticScholarResponse) => this.parseHit(hit)));
+      const settled = await Promise.allSettled(hits.map((hit) => this.parseHit(hit)));
+      return settled
+        .filter((r): r is PromiseFulfilledResult<bibtexParse.BibtexEntry> => r.status === "fulfilled")
+        .map((r) => r.value);
     } catch (error) {
-      console.error("Error fetching from Semantic Scholar:", error);
+      ztoolkit.log("Error fetching from Semantic Scholar:", error);
       return [];
     }
   }
 
   private static parseHit(data: SemanticScholarResponse): bibtexParse.BibtexEntry {
     const bibText = data.citationStyles?.bibtex;
-    if (bibText) {
-      const parsed = bibtexParse.toJSON(bibText);
-      return parsed[0];
+    if (!bibText) {
+      throw new Error(`No BibTeX available for: ${data.title}`);
     }
-
-    throw new Error("No BibTeX data found");
+    const parsed = bibtexParse.toJSON(bibText);
+    if (!parsed[0]) {
+      throw new Error(`Failed to parse BibTeX for: ${data.title}`);
+    }
+    return parsed[0];
   }
 }
