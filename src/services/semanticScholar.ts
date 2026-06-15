@@ -1,6 +1,6 @@
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 import { getPref } from "../utils/prefs";
-import { RateLimitError } from "../utils/errors";
+import { RateLimitError, isRateLimitError } from "../utils/errors";
 
 export { RateLimitError };
 
@@ -64,9 +64,7 @@ export class SemanticScholarService {
       });
     } catch (error) {
       // Zotero.HTTP.request throws UnexpectedStatusException for non-2xx responses
-      if ((error as any)?.status === 429) {
-        throw new RateLimitError("Semantic Scholar");
-      }
+      if (isRateLimitError(error)) throw new RateLimitError("Semantic Scholar");
       ztoolkit.log("Network error fetching from Semantic Scholar:", error);
       throw error;
     }

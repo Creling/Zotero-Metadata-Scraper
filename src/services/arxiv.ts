@@ -1,5 +1,5 @@
 import * as bibtexParse from "@orcid/bibtex-parse-js";
-import { RateLimitError } from "../utils/errors";
+import { RateLimitError, isRateLimitError } from "../utils/errors";
 
 const ATOM_NS = "http://www.w3.org/2005/Atom";
 const ARXIV_NS = "http://arxiv.org/schemas/atom";
@@ -24,7 +24,7 @@ export class ArXivService {
         responseType: "document",
       });
     } catch (error) {
-      if ((error as any)?.status === 429) throw new RateLimitError("arXiv");
+      if (isRateLimitError(error)) throw new RateLimitError("arXiv");
       ztoolkit.log("Network error fetching from arXiv:", error);
       throw error;
     }

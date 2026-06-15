@@ -1,5 +1,5 @@
 import * as bibtexParse from "@orcid/bibtex-parse-js";
-import { RateLimitError } from "../utils/errors";
+import { RateLimitError, isRateLimitError } from "../utils/errors";
 
 interface OpenAlexWork {
   id?: string;
@@ -54,7 +54,7 @@ export class OpenAlexService {
         responseType: "json",
       });
     } catch (error) {
-      if ((error as any)?.status === 429) throw new RateLimitError("OpenAlex");
+      if (isRateLimitError(error)) throw new RateLimitError("OpenAlex");
       ztoolkit.log("Network error fetching from OpenAlex:", error);
       throw error;
     }

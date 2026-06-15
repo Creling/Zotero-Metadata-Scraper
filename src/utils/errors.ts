@@ -4,3 +4,7 @@ export class RateLimitError extends Error {
     this.name = "RateLimitError";
   }
 }
+
+export function isRateLimitError(err: unknown): boolean {
+  return (err as any)?.status === 429;
+}

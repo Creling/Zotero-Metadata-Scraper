@@ -1,14 +1,10 @@
-import { DBLPService } from "../services/dblp";
 import { SearchResultDialog } from "./searchResultDialog";
-import { SemanticScholarService } from "../services/semanticScholar";
-import { CrossRefService } from "../services/crossref";
-import { OpenAlexService } from "../services/openAlex";
-import { ArXivService } from "../services/arxiv";
+import { METADATA_SOURCES, MetadataSource } from "../services/registry";
 import { RateLimitError } from "../utils/errors";
 import { getString } from "../utils/locale";
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 
-export type MetadataSource = "dblp" | "semantic-scholar" | "crossref" | "openalex" | "arxiv";
+export type { MetadataSource };
 
 export class MetadataUpdater {
   public static async updateItemMetadata(item: Zotero.Item, source: MetadataSource = "dblp"): Promise<boolean> {
@@ -17,7 +13,7 @@ export class MetadataUpdater {
 
     let results: bibtexParse.BibtexEntry[];
     try {
-      results = await this.search(title, source);
+      results = await METADATA_SOURCES.find((s) => s.id === source)!.search(title);
     } catch (error) {
       const text =
         error instanceof RateLimitError ? getString("metadata-rate-limited") : getString("metadata-search-error");
@@ -43,22 +39,7 @@ export class MetadataUpdater {
     return this.updateFromBibtex(item, selected);
   }
 
-  private static search(title: string, source: MetadataSource): Promise<bibtexParse.BibtexEntry[]> {
-    switch (source) {
-      case "dblp":
-        return DBLPService.searchByTitle(title);
-      case "semantic-scholar":
-        return SemanticScholarService.searchByTitle(title);
-      case "crossref":
-        return CrossRefService.searchByTitle(title);
-      case "openalex":
-        return OpenAlexService.searchByTitle(title);
-      case "arxiv":
-        return ArXivService.searchByTitle(title);
-    }
-  }
-
-  private static getZoteroItemType(dblpType: string): string {
+  private static getZoteroItemType(bibtexType: string): string {
     const typeMap: { [key: string]: string } = {
       article: "journalArticle",
       inproceedings: "conferencePaper",
@@ -75,7 +56,7 @@ export class MetadataUpdater {
       misc: "document",
     };
 
-    return typeMap[dblpType] || "journalArticle"; // Default to journalArticle if type is unknown
+    return typeMap[bibtexType] || "journalArticle";
   }
 
   private static async updateJournalArticle(item: Zotero.Item, result: bibtexParse.BibtexEntry) {
@@ -103,9 +84,8 @@ export class MetadataUpdater {
 
   public static async updateFromBibtex(item: Zotero.Item, result: bibtexParse.BibtexEntry): Promise<boolean> {
     try {
-      ztoolkit.log("Updating item metadata from DBLP:", item, result);
+      ztoolkit.log("Updating item metadata:", item, result);
 
-      // Update item type first
       const newType = this.getZoteroItemType(result.entryType);
       const itemTypeID = Zotero.ItemTypes.getID(newType);
       if (typeof itemTypeID === "number") {
@@ -114,46 +94,23 @@ export class MetadataUpdater {
         throw new Error("Invalid item type ID");
       }
 
-      // Update basic metadata
-      if (result.entryTags.title) {
-        item.setField("title", result.entryTags.title);
-      }
-      if (result.entryTags.year) {
-        item.setField("date", result.entryTags.year);
-      }
-      if (result.entryTags.doi) {
-        item.setField("DOI", result.entryTags.doi);
-      }
-      if (result.entryTags.url) {
-        item.setField("url", result.entryTags.url);
-      }
-      if (result.entryTags.pages) {
-        item.setField("pages", result.entryTags.pages);
-      }
-      if (result.entryTags.publisher) {
-        item.setField("publisher", result.entryTags.publisher);
-      }
-      if (result.entryTags.address) {
-        item.setField("place", result.entryTags.address);
-      }
-      if (result.entryTags.isbn) {
-        item.setField("ISBN", result.entryTags.isbn);
-      }
-      if (result.entryTags.volume) {
-        item.setField("volume", result.entryTags.volume);
-      }
-      if (result.entryTags.series) {
-        item.setField("series", result.entryTags.series);
-      }
+      if (result.entryTags.title) item.setField("title", result.entryTags.title);
+      if (result.entryTags.year) item.setField("date", result.entryTags.year);
+      if (result.entryTags.doi) item.setField("DOI", result.entryTags.doi);
+      if (result.entryTags.url) item.setField("url", result.entryTags.url);
+      if (result.entryTags.pages) item.setField("pages", result.entryTags.pages);
+      if (result.entryTags.publisher) item.setField("publisher", result.entryTags.publisher);
+      if (result.entryTags.address) item.setField("place", result.entryTags.address);
+      if (result.entryTags.isbn) item.setField("ISBN", result.entryTags.isbn);
+      if (result.entryTags.volume) item.setField("volume", result.entryTags.volume);
+      if (result.entryTags.series) item.setField("series", result.entryTags.series);
 
-      // Update type-specific fields
       if (newType === "journalArticle") {
         await this.updateJournalArticle(item, result);
       } else if (newType === "conferencePaper") {
         await this.updateConferencePaper(item, result);
       }
 
-      // Update creators (authors)
       if (result.entryTags.author) {
         item.setCreators(
           result.entryTags.author.split(" and ").map((author) => ({
@@ -167,7 +124,7 @@ export class MetadataUpdater {
       await item.saveTx();
       return true;
     } catch (error) {
-      ztoolkit.log("Error updating metadata from DBLP:", error);
+      ztoolkit.log("Error updating metadata:", error);
       return false;
     }
   }

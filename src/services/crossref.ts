@@ -1,5 +1,5 @@
 import * as bibtexParse from "@orcid/bibtex-parse-js";
-import { RateLimitError } from "../utils/errors";
+import { RateLimitError, isRateLimitError } from "../utils/errors";
 
 interface CrossRefAuthor {
   given?: string;
@@ -58,7 +58,7 @@ export class CrossRefService {
         responseType: "json",
       });
     } catch (error) {
-      if ((error as any)?.status === 429) throw new RateLimitError("CrossRef");
+      if (isRateLimitError(error)) throw new RateLimitError("CrossRef");
       ztoolkit.log("Network error fetching from CrossRef:", error);
       throw error;
     }

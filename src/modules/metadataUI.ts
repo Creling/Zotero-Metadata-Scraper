@@ -1,5 +1,6 @@
 import { getString } from "../utils/locale";
-import { MetadataSource, MetadataUpdater } from "./metadataUpdater";
+import { MetadataUpdater } from "./metadataUpdater";
+import { METADATA_SOURCES, MetadataSource } from "../services/registry";
 
 export class MetadataUIFactory {
   private static async updateItems(items: Zotero.Item[], source: MetadataSource) {
@@ -66,15 +67,7 @@ export class MetadataUIFactory {
           {
             tag: "menupopup",
             namespace: "xul",
-            children: (
-              [
-                ["DBLP", "dblp"],
-                ["Semantic Scholar", "semantic-scholar"],
-                ["CrossRef", "crossref"],
-                ["OpenAlex", "openalex"],
-                ["arXiv", "arxiv"],
-              ] as [string, MetadataSource][]
-            ).map(([label, source]) => ({
+            children: METADATA_SOURCES.map(({ id, label }) => ({
               tag: "menuitem",
               namespace: "xul",
               attributes: { label },
@@ -84,7 +77,7 @@ export class MetadataUIFactory {
                   listener: async () => {
                     const items = Zotero.getActiveZoteroPane().getSelectedItems();
                     if (!items || !items.length) return;
-                    await MetadataUIFactory.updateItems(items, source);
+                    await MetadataUIFactory.updateItems(items, id as MetadataSource);
                   },
                 },
               ],
