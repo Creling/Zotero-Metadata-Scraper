@@ -1,5 +1,8 @@
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 import { getPref } from "../utils/prefs";
+import { RateLimitError } from "../utils/errors";
+
+export { RateLimitError };
 
 export interface Author {
   name: string;
@@ -37,13 +40,6 @@ export interface SemanticScholarResponse {
   citationStyles?: {
     bibtex: string;
   };
-}
-
-export class RateLimitError extends Error {
-  constructor(source: string) {
-    super(`Rate limited by ${source}. Try again later or add an API key.`);
-    this.name = "RateLimitError";
-  }
 }
 
 export class SemanticScholarService {

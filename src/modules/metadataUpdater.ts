@@ -1,23 +1,23 @@
 import { DBLPService } from "../services/dblp";
 import { SearchResultDialog } from "./searchResultDialog";
-import { RateLimitError, SemanticScholarService } from "../services/semanticScholar";
+import { SemanticScholarService } from "../services/semanticScholar";
+import { CrossRefService } from "../services/crossref";
+import { OpenAlexService } from "../services/openAlex";
+import { ArXivService } from "../services/arxiv";
+import { RateLimitError } from "../utils/errors";
 import { getString } from "../utils/locale";
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 
+export type MetadataSource = "dblp" | "semantic-scholar" | "crossref" | "openalex" | "arxiv";
+
 export class MetadataUpdater {
-  public static async updateItemMetadata(
-    item: Zotero.Item,
-    source: "dblp" | "semantic-scholar" = "dblp",
-  ): Promise<boolean> {
+  public static async updateItemMetadata(item: Zotero.Item, source: MetadataSource = "dblp"): Promise<boolean> {
     const title = item.getField("title") as string;
     if (!title) return false;
 
     let results: bibtexParse.BibtexEntry[];
     try {
-      results =
-        source === "dblp"
-          ? await DBLPService.searchByTitle(title)
-          : await SemanticScholarService.searchByTitle(title);
+      results = await this.search(title, source);
     } catch (error) {
       const text =
         error instanceof RateLimitError
@@ -43,6 +43,16 @@ export class MetadataUpdater {
     if (!selected) return false;
 
     return this.updateFromBibtex(item, selected);
+  }
+
+  private static search(title: string, source: MetadataSource): Promise<bibtexParse.BibtexEntry[]> {
+    switch (source) {
+      case "dblp": return DBLPService.searchByTitle(title);
+      case "semantic-scholar": return SemanticScholarService.searchByTitle(title);
+      case "crossref": return CrossRefService.searchByTitle(title);
+      case "openalex": return OpenAlexService.searchByTitle(title);
+      case "arxiv": return ArXivService.searchByTitle(title);
+    }
   }
 
   private static getZoteroItemType(dblpType: string): string {

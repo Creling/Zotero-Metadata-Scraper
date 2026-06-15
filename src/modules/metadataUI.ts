@@ -1,8 +1,8 @@
 import { getString } from "../utils/locale";
-import { MetadataUpdater } from "./metadataUpdater";
+import { MetadataSource, MetadataUpdater } from "./metadataUpdater";
 
 export class MetadataUIFactory {
-  private static async updateItems(items: Zotero.Item[], source: "dblp" | "semantic-scholar") {
+  private static async updateItems(items: Zotero.Item[], source: MetadataSource) {
     const progressWin = new ztoolkit.ProgressWindow(addon.data.config.addonName)
       .createLine({
         text: getString("metadata-updating"),
@@ -66,38 +66,29 @@ export class MetadataUIFactory {
           {
             tag: "menupopup",
             namespace: "xul",
-            children: [
-              {
-                tag: "menuitem",
-                namespace: "xul",
-                attributes: { label: "DBLP" },
-                listeners: [
-                  {
-                    type: "command",
-                    listener: async () => {
-                      const items = Zotero.getActiveZoteroPane().getSelectedItems();
-                      if (!items || !items.length) return;
-                      await MetadataUIFactory.updateItems(items, "dblp");
-                    },
+            children: (
+              [
+                ["DBLP", "dblp"],
+                ["Semantic Scholar", "semantic-scholar"],
+                ["CrossRef", "crossref"],
+                ["OpenAlex", "openalex"],
+                ["arXiv", "arxiv"],
+              ] as [string, MetadataSource][]
+            ).map(([label, source]) => ({
+              tag: "menuitem",
+              namespace: "xul",
+              attributes: { label },
+              listeners: [
+                {
+                  type: "command",
+                  listener: async () => {
+                    const items = Zotero.getActiveZoteroPane().getSelectedItems();
+                    if (!items || !items.length) return;
+                    await MetadataUIFactory.updateItems(items, source);
                   },
-                ],
-              },
-              {
-                tag: "menuitem",
-                namespace: "xul",
-                attributes: { label: "Semantic Scholar" },
-                listeners: [
-                  {
-                    type: "command",
-                    listener: async () => {
-                      const items = Zotero.getActiveZoteroPane().getSelectedItems();
-                      if (!items || !items.length) return;
-                      await MetadataUIFactory.updateItems(items, "semantic-scholar");
-                    },
-                  },
-                ],
-              },
-            ],
+                },
+              ],
+            })),
           },
         ],
       },
