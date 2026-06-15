@@ -31,13 +31,13 @@ A Zotero plugin that automatically retrieves and updates paper metadata from mul
 
 ### Which source should I use?
 
-| Source | Best for |
-|--------|----------|
-| **CrossRef** | Journal articles and anything with a DOI |
-| **DBLP** | Computer science conference and journal papers |
-| **Semantic Scholar** | General academic papers across disciplines |
-| **OpenAlex** | Working papers, reports, and grey literature |
-| **arXiv** | CS, physics, and math preprints |
+| Source               | Best for                                       |
+| -------------------- | ---------------------------------------------- |
+| **CrossRef**         | Journal articles and anything with a DOI       |
+| **DBLP**             | Computer science conference and journal papers |
+| **Semantic Scholar** | General academic papers across disciplines     |
+| **OpenAlex**         | Working papers, reports, and grey literature   |
+| **arXiv**            | CS, physics, and math preprints                |
 
 ![image](https://github.com/user-attachments/assets/05221bd1-05c3-4fe0-86ee-571a0487bcf6)
 
@@ -106,6 +106,38 @@ npm run build
 npm run lint:check  # Check code style
 npm run lint:fix    # Fix code style
 ```
+
+### Adding a new metadata source
+
+1. Create `src/services/mySource.ts` with a class that exposes a single static method:
+
+```typescript
+import * as bibtexParse from "@orcid/bibtex-parse-js";
+import { RateLimitError, isRateLimitError } from "../utils/errors";
+
+export class MySourceService {
+  public static async searchByTitle(title: string): Promise<bibtexParse.BibtexEntry[]> {
+    let response: Awaited<ReturnType<typeof Zotero.HTTP.request>>;
+    try {
+      response = await Zotero.HTTP.request("GET", `https://api.example.com/search?q=${encodeURIComponent(title)}`, {
+        responseType: "json",
+      });
+    } catch (error) {
+      if (isRateLimitError(error)) throw new RateLimitError("My Source");
+      throw error;
+    }
+    // parse response.response and return BibtexEntry[]
+  }
+}
+```
+
+2. Add one entry to `METADATA_SOURCES` in `src/services/registry.ts`:
+
+```typescript
+{ id: "my-source", label: "My Source", search: (t) => MySourceService.searchByTitle(t) },
+```
+
+That's it — the type union, the dispatch logic, and the right-click menu all update automatically.
 
 ## License
 
