@@ -20,9 +20,7 @@ export class MetadataUpdater {
       results = await this.search(title, source);
     } catch (error) {
       const text =
-        error instanceof RateLimitError
-          ? getString("metadata-rate-limited")
-          : getString("metadata-search-error");
+        error instanceof RateLimitError ? getString("metadata-rate-limited") : getString("metadata-search-error");
       new ztoolkit.ProgressWindow(addon.data.config.addonName)
         .createLine({ text, type: "fail" })
         .show()
@@ -47,11 +45,16 @@ export class MetadataUpdater {
 
   private static search(title: string, source: MetadataSource): Promise<bibtexParse.BibtexEntry[]> {
     switch (source) {
-      case "dblp": return DBLPService.searchByTitle(title);
-      case "semantic-scholar": return SemanticScholarService.searchByTitle(title);
-      case "crossref": return CrossRefService.searchByTitle(title);
-      case "openalex": return OpenAlexService.searchByTitle(title);
-      case "arxiv": return ArXivService.searchByTitle(title);
+      case "dblp":
+        return DBLPService.searchByTitle(title);
+      case "semantic-scholar":
+        return SemanticScholarService.searchByTitle(title);
+      case "crossref":
+        return CrossRefService.searchByTitle(title);
+      case "openalex":
+        return OpenAlexService.searchByTitle(title);
+      case "arxiv":
+        return ArXivService.searchByTitle(title);
     }
   }
 

@@ -24,23 +24,22 @@ interface CrossRefItem {
 const CROSSREF_TYPE_MAP: Record<string, string> = {
   "journal-article": "article",
   "proceedings-article": "inproceedings",
-  "book": "book",
+  book: "book",
   "book-chapter": "incollection",
-  "monograph": "book",
+  monograph: "book",
   "edited-book": "book",
   "reference-book": "book",
-  "report": "techreport",
-  "dissertation": "phdthesis",
+  report: "techreport",
+  dissertation: "phdthesis",
   "posted-content": "misc",
-  "dataset": "misc",
+  dataset: "misc",
   "peer-review": "misc",
-  "standard": "techreport",
+  standard: "techreport",
 };
 
 export class CrossRefService {
   private static readonly BASE_URL = "https://api.crossref.org";
-  private static readonly USER_AGENT =
-    "ZoteroMetadataScraper/1.0 (https://github.com/creling/zotero-metadata-scraper)";
+  private static readonly USER_AGENT = "ZoteroMetadataScraper/1.0 (https://github.com/creling/zotero-metadata-scraper)";
 
   public static async searchByTitle(title: string): Promise<bibtexParse.BibtexEntry[]> {
     const queryParams = new URLSearchParams({

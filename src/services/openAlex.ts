@@ -65,15 +65,12 @@ export class OpenAlexService {
 
   private static parseWork(work: OpenAlexWork): bibtexParse.BibtexEntry {
     const entryType = OPENALEX_TYPE_MAP[work.type ?? ""] ?? "article";
-    const authorStr = (work.authorships ?? [])
-      .map((a) => a.author.display_name)
-      .join(" and ");
+    const authorStr = (work.authorships ?? []).map((a) => a.author.display_name).join(" and ");
     const doi = work.doi?.replace("https://doi.org/", "") ?? "";
     const venue = work.primary_location?.source?.display_name ?? "";
     const isConference = entryType === "inproceedings";
     const b = work.biblio ?? {};
-    const pages =
-      b.first_page ? (b.last_page ? `${b.first_page}-${b.last_page}` : b.first_page) : undefined;
+    const pages = b.first_page ? (b.last_page ? `${b.first_page}-${b.last_page}` : b.first_page) : undefined;
 
     return {
       citationKey: work.id?.split("/").pop() ?? "unknown",
