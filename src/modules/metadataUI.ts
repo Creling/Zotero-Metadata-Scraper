@@ -1,8 +1,9 @@
 import { getString } from "../utils/locale";
 import { MetadataUpdater } from "./metadataUpdater";
+import { METADATA_SOURCES, MetadataSource } from "../services/registry";
 
 export class MetadataUIFactory {
-  private static async updateItems(items: Zotero.Item[], source: "dblp" | "semantic-scholar") {
+  private static async updateItems(items: Zotero.Item[], source: MetadataSource) {
     const progressWin = new ztoolkit.ProgressWindow(addon.data.config.addonName)
       .createLine({
         text: getString("metadata-updating"),
@@ -47,32 +48,44 @@ export class MetadataUIFactory {
     });
   }
 
-  public static registerRightClickMenuItem() {
+  public static registerRightClickMenuItem(win: _ZoteroTypes.MainWindow) {
     const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`;
-    ztoolkit.Menu.register("item", {
-      tag: "menu",
-      label: getString("menuitem-fetch-metadata"),
-      icon: menuIcon,
-      children: [
-        {
-          tag: "menuitem",
-          label: "DBLP",
-          commandListener: async (ev) => {
-            const items = Zotero.getActiveZoteroPane().getSelectedItems();
-            if (!items || !items.length) return;
-            await this.updateItems(items, "dblp");
-          },
+    const popup = win.document.getElementById("zotero-itemmenu");
+    if (!popup) return;
+
+    ztoolkit.UI.appendElement(
+      {
+        tag: "menu",
+        namespace: "xul",
+        id: `${addon.data.config.addonRef}-fetch-menu`,
+        attributes: {
+          label: getString("menuitem-fetch-metadata"),
+          image: menuIcon,
+          class: "menu-iconic",
         },
-        {
-          tag: "menuitem",
-          label: "Semantic Scholar",
-          commandListener: async (ev) => {
-            const items = Zotero.getActiveZoteroPane().getSelectedItems();
-            if (!items || !items.length) return;
-            await this.updateItems(items, "semantic-scholar");
+        children: [
+          {
+            tag: "menupopup",
+            namespace: "xul",
+            children: METADATA_SOURCES.map(({ id, label }) => ({
+              tag: "menuitem",
+              namespace: "xul",
+              attributes: { label },
+              listeners: [
+                {
+                  type: "command",
+                  listener: async () => {
+                    const items = Zotero.getActiveZoteroPane().getSelectedItems();
+                    if (!items || !items.length) return;
+                    await MetadataUIFactory.updateItems(items, id as MetadataSource);
+                  },
+                },
+              ],
+            })),
           },
-        },
-      ],
-    });
+        ],
+      },
+      popup,
+    );
   }
 }

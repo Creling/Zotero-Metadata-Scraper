@@ -13,6 +13,9 @@ tabpanel-reader-tab-label = Reader Tab
 menuitem-fetch-metadata = Fetch Metadata
 metadata-updating = Updating metadata...
 metadata-update-complete = Updated {$successCount} of {$totalItems} items
+metadata-no-results = No matching results found for: {$title}
+metadata-rate-limited = Rate limited — wait a moment then try again, or add an API key in settings
+metadata-search-error = Search failed — check the Zotero debug log for details
 
 search-results = Search Results
 select-result = Select Result

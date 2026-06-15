@@ -1,5 +1,4 @@
 import { getString } from "../utils/locale";
-import { DBLPResult } from "../services/dblp";
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 
 export class SearchResultDialog {

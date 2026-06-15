@@ -1,5 +1,5 @@
 import { config } from "../package.json";
-import { DialogHelper } from "zotero-plugin-toolkit/dist/helpers/dialog";
+import { DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
 

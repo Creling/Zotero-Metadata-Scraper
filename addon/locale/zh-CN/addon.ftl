@@ -12,6 +12,9 @@ tabpanel-reader-tab-label = 阅读器标签
 
 metadata-updating = 正在更新元数据...
 metadata-update-complete = 已更新 {$totalItems} 个条目中的 {$successCount} 个
+metadata-no-results = 未找到匹配结果: {$title}
+metadata-rate-limited = 请求过于频繁，请稍后再试，或在设置中添加 API 密钥
+metadata-search-error = 搜索失败，请查看 Zotero 调试日志了解详情
 
 menuitem-fetch-metadata = 获取元数据
 search-results = 搜索结果
