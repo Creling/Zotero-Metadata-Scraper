@@ -39,46 +39,50 @@ export interface SemanticScholarResponse {
   };
 }
 
+export class RateLimitError extends Error {
+  constructor(source: string) {
+    super(`Rate limited by ${source}. Try again later or add an API key.`);
+    this.name = "RateLimitError";
+  }
+}
+
 export class SemanticScholarService {
   private static readonly BASE_URL = "https://api.semanticscholar.org/graph/v1";
 
   public static async searchByTitle(title: string): Promise<bibtexParse.BibtexEntry[]> {
+    const queryParams = new URLSearchParams({
+      query: title,
+      limit: "10",
+      fields: "title,abstract,venue,year,authors,externalIds,citationCount,citationStyles",
+    });
+
+    const apiKey = getPref("semanticScholarAPIKey");
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (apiKey) headers["x-api-key"] = apiKey;
+
+    let response: Awaited<ReturnType<typeof Zotero.HTTP.request>>;
     try {
-      const queryParams = new URLSearchParams({
-        query: title,
-        limit: "10",
-        fields: "title,abstract,venue,year,authors,externalIds,citationCount,citationStyles",
-      });
-
-      const apiKey = getPref("semanticScholarAPIKey");
-      const headers: Record<string, string> = {
-        Accept: "application/json",
-      };
-
-      if (apiKey) {
-        headers["x-api-key"] = apiKey;
-      }
-
-      const response = await Zotero.HTTP.request("GET", `${this.BASE_URL}/paper/search?${queryParams.toString()}`, {
+      response = await Zotero.HTTP.request("GET", `${this.BASE_URL}/paper/search?${queryParams.toString()}`, {
         headers,
         responseType: "json",
       });
-
-      if (!response.status || response.status !== 200) {
-        throw new Error(`Semantic Scholar API error: ${response.status}`);
-      }
-
-      const data = response.response;
-      const hits: SemanticScholarResponse[] = data.data || [];
-
-      const settled = await Promise.allSettled(hits.map((hit) => this.parseHit(hit)));
-      return settled
-        .filter((r): r is PromiseFulfilledResult<bibtexParse.BibtexEntry> => r.status === "fulfilled")
-        .map((r) => r.value);
     } catch (error) {
-      ztoolkit.log("Error fetching from Semantic Scholar:", error);
-      return [];
+      ztoolkit.log("Network error fetching from Semantic Scholar:", error);
+      throw error;
     }
+
+    if (response.status === 429) {
+      throw new RateLimitError("Semantic Scholar");
+    }
+    if (response.status !== 200) {
+      throw new Error(`Semantic Scholar API error: ${response.status}`);
+    }
+
+    const hits: SemanticScholarResponse[] = response.response?.data ?? [];
+    const settled = await Promise.allSettled(hits.map((hit) => this.parseHit(hit)));
+    return settled
+      .filter((r): r is PromiseFulfilledResult<bibtexParse.BibtexEntry> => r.status === "fulfilled")
+      .map((r) => r.value);
   }
 
   private static parseHit(data: SemanticScholarResponse): bibtexParse.BibtexEntry {

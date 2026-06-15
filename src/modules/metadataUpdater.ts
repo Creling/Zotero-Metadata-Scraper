@@ -1,6 +1,6 @@
 import { DBLPService } from "../services/dblp";
 import { SearchResultDialog } from "./searchResultDialog";
-import { SemanticScholarService } from "../services/semanticScholar";
+import { RateLimitError, SemanticScholarService } from "../services/semanticScholar";
 import { getString } from "../utils/locale";
 import * as bibtexParse from "@orcid/bibtex-parse-js";
 
@@ -12,10 +12,24 @@ export class MetadataUpdater {
     const title = item.getField("title") as string;
     if (!title) return false;
 
-    const results =
-      source === "dblp"
-        ? await DBLPService.searchByTitle(title)
-        : await SemanticScholarService.searchByTitle(title);
+    let results: bibtexParse.BibtexEntry[];
+    try {
+      results =
+        source === "dblp"
+          ? await DBLPService.searchByTitle(title)
+          : await SemanticScholarService.searchByTitle(title);
+    } catch (error) {
+      const text =
+        error instanceof RateLimitError
+          ? getString("metadata-rate-limited")
+          : getString("metadata-search-error");
+      new ztoolkit.ProgressWindow(addon.data.config.addonName)
+        .createLine({ text, type: "fail" })
+        .show()
+        .startCloseTimer(8000);
+      ztoolkit.log("Search error:", error);
+      return false;
+    }
 
     if (results.length === 0) {
       new ztoolkit.ProgressWindow(addon.data.config.addonName)
