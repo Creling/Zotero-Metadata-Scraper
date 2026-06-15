@@ -67,15 +67,12 @@ export class SemanticScholarService {
         responseType: "json",
       });
     } catch (error) {
+      // Zotero.HTTP.request throws UnexpectedStatusException for non-2xx responses
+      if ((error as any)?.status === 429) {
+        throw new RateLimitError("Semantic Scholar");
+      }
       ztoolkit.log("Network error fetching from Semantic Scholar:", error);
       throw error;
-    }
-
-    if (response.status === 429) {
-      throw new RateLimitError("Semantic Scholar");
-    }
-    if (response.status !== 200) {
-      throw new Error(`Semantic Scholar API error: ${response.status}`);
     }
 
     const hits: SemanticScholarResponse[] = response.response?.data ?? [];
